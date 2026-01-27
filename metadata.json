@@ -1,0 +1,5 @@
+{
+  "name": "Zenith Lecteur de Comics",
+  "description": "Un lecteur de bandes dessinées haute performance basé sur un navigateur, prenant en charge les fichiers CBZ. Dispose d'un mode de lecture immersif, d'une mise à l'échelle intelligente et d'une analyse de page par IA.",
+  "requestFramePermissions": []
+}
