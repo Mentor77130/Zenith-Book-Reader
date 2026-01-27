@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Upload, BookOpen, AlertCircle } from 'lucide-react';
 
 interface UploadViewProps {
@@ -9,6 +9,20 @@ interface UploadViewProps {
 
 const UploadView: React.FC<UploadViewProps> = ({ onFileSelect, isLoading, error }) => {
   const [dragActive, setDragActive] = useState(false);
+
+  // Chargement du script AdSense
+  useEffect(() => {
+    const scriptId = "adsense-script";
+    // Empêche le chargement multiple du script
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement("script");
+      script.id = scriptId;
+      script.async = true;
+      script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8451580063826204";
+      script.crossOrigin = "anonymous";
+      document.head.appendChild(script);
+    }
+  }, []);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -72,7 +86,7 @@ const UploadView: React.FC<UploadViewProps> = ({ onFileSelect, isLoading, error 
           <input 
             type="file" 
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-            accept=".cbz,.zip,.cbr,.pdf,.epub,.pub"
+            accept=".cbz,.zip,.cbr,.pdf,.epub,.pub,application/zip,application/x-zip-compressed,application/x-cbr,application/x-rar-compressed,application/pdf,application/epub+zip"
             onChange={handleChange}
             disabled={isLoading}
           />
