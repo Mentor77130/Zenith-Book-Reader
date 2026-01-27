@@ -53,7 +53,7 @@ const UploadView: React.FC<UploadViewProps> = ({ onFileSelect, isLoading, error 
             Lecteur Zenith
           </h1>
           <p className="text-gray-400 text-lg">
-            Un lecteur de bandes dessinées et CBZ nouvelle génération.
+            Un lecteur de bandes dessinées universel.
           </p>
         </div>
 
@@ -72,7 +72,7 @@ const UploadView: React.FC<UploadViewProps> = ({ onFileSelect, isLoading, error 
           <input 
             type="file" 
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-            accept=".cbz,.zip,.cbr"
+            accept=".cbz,.zip,.cbr,.pdf,.epub,.pub"
             onChange={handleChange}
             disabled={isLoading}
           />
@@ -81,8 +81,8 @@ const UploadView: React.FC<UploadViewProps> = ({ onFileSelect, isLoading, error 
             {isLoading ? (
               <div className="flex flex-col items-center animate-pulse">
                 <div className="w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full animate-spin mb-4" />
-                <p className="text-gray-300 font-medium">Décompression de la bande dessinée...</p>
-                <p className="text-xs text-gray-500 mt-2">Cela se produit localement dans votre navigateur</p>
+                <p className="text-gray-300 font-medium">Traitement du fichier...</p>
+                <p className="text-xs text-gray-500 mt-2">Conversion et extraction locale</p>
               </div>
             ) : (
               <>
@@ -91,10 +91,10 @@ const UploadView: React.FC<UploadViewProps> = ({ onFileSelect, isLoading, error 
                 </div>
                 <div>
                   <p className="text-lg font-semibold text-gray-200">
-                    Glissez-déposez votre fichier ici
+                    Glissez-déposez votre ebook ici
                   </p>
                   <p className="text-sm text-gray-500 mt-1">
-                    Supporte les fichiers .cbz et .zip. (Support expérimental du .cbr)
+                    Supporte CBZ, ZIP, PDF, EPUB et CBR
                   </p>
                 </div>
                 <button className="px-6 py-2 bg-gray-800 hover:bg-gray-700 text-brand-400 text-sm font-medium rounded-lg transition-colors border border-gray-700">

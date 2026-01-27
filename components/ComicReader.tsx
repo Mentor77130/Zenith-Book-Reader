@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { ComicPage, ReadingMode } from '../types';
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Columns, FileText, Sparkles, X, Menu, Maximize, Minimize } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Columns, FileText, X, Menu, Maximize, Minimize } from 'lucide-react';
 import { Button } from './Button';
-import { GeminiService, blobUrlToBase64 } from '../services/geminiService';
 
 interface ComicReaderProps {
   pages: ComicPage[];
@@ -18,13 +17,7 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   
-  // AI State
-  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isAiPanelOpen, setIsAiPanelOpen] = useState(false);
-
   const containerRef = useRef<HTMLDivElement>(null);
-  const geminiService = useRef(new GeminiService());
 
   // Handle keyboard navigation
   useEffect(() => {
@@ -34,14 +27,13 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
       } else if (e.key === 'ArrowLeft') {
         prevPage();
       } else if (e.key === 'Escape') {
-        if (isAiPanelOpen) setIsAiPanelOpen(false);
-        else if (isSidebarOpen) setIsSidebarOpen(false);
+        if (isSidebarOpen) setIsSidebarOpen(false);
         // Do not close app on escape if purely exiting fullscreen, handled by browser
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentPage, mode, isSidebarOpen, isAiPanelOpen]);
+  }, [currentPage, mode, isSidebarOpen]);
 
   // Handle Fullscreen change events
   useEffect(() => {
@@ -87,23 +79,6 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
       if (document.exitFullscreen) {
         await document.exitFullscreen();
       }
-    }
-  };
-
-  const handleAnalyzePage = async () => {
-    setIsAiPanelOpen(true);
-    setIsAnalyzing(true);
-    setAiAnalysis(null);
-    
-    try {
-      const pageToAnalyze = pages[currentPage];
-      const base64 = await blobUrlToBase64(pageToAnalyze.url);
-      const result = await geminiService.current.analyzeComicPage(base64);
-      setAiAnalysis(result);
-    } catch (err) {
-      setAiAnalysis("Échec de l'analyse. Vérifiez votre connexion ou votre clé API.");
-    } finally {
-      setIsAnalyzing(false);
     }
   };
 
@@ -225,16 +200,6 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
           <Columns size={20} />
         </Button>
 
-        <Button 
-          variant="icon" 
-          active={isAiPanelOpen}
-          onClick={(e) => { e.stopPropagation(); handleAnalyzePage(); }}
-          title="Analyse IA"
-          className="text-brand-400 hover:text-brand-300"
-        >
-          <Sparkles size={20} />
-        </Button>
-        
         <div className="w-px h-6 bg-gray-700 mx-1" />
 
         <Button variant="icon" onClick={(e) => { e.stopPropagation(); nextPage(); }} disabled={currentPage >= totalPages - 1} title="Suivant">
@@ -267,38 +232,6 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
             </div>
           ))}
         </div>
-      </div>
-
-      {/* AI Panel */}
-      <div className={`absolute top-0 right-0 h-full w-80 bg-gray-900 border-l border-gray-800 z-30 transform transition-transform duration-300 ${isAiPanelOpen ? 'translate-x-0' : 'translate-x-full'} shadow-2xl`}>
-         <div className="p-4 border-b border-gray-800 flex justify-between items-center bg-gray-900">
-            <div className="flex items-center gap-2 text-brand-400">
-              <Sparkles size={18} />
-              <h3 className="font-bold">Assistant IA</h3>
-            </div>
-            <Button variant="icon" size="sm" onClick={() => setIsAiPanelOpen(false)}>
-              <X size={18} />
-            </Button>
-         </div>
-         <div className="p-6 h-[calc(100%-60px)] overflow-y-auto">
-            {isAnalyzing ? (
-              <div className="flex flex-col items-center justify-center h-48 gap-4 text-gray-400">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-brand-500"></div>
-                <p className="text-sm">Analyse de la page en cours...</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">
-                  {aiAnalysis || "Cliquez sur l'icône Étincelles pour analyser la page actuelle. L'IA peut décrire les scènes, traduire le texte et expliquer l'intrigue."}
-                </div>
-                {aiAnalysis && (
-                   <div className="pt-4 border-t border-gray-800">
-                     <p className="text-xs text-gray-500 italic">Analyse fournie par Gemini 3 Flash Preview.</p>
-                   </div>
-                )}
-              </div>
-            )}
-         </div>
       </div>
     </div>
   );

@@ -16,28 +16,26 @@ function App() {
     setFilename(file.name);
 
     try {
-      // Basic check for file extension
       const extension = file.name.split('.').pop()?.toLowerCase();
       
+      // Basic extension check for UX, though processor handles logic
       if (extension === 'cbr') {
-        // Soft warning/handling for CBR since we are using pure JS/Zip logic
-        // Some users rename zip to cbr, so we try anyway, but warn if it fails.
         console.warn("Fichier CBR détecté. Tentative de traitement en tant que Zip.");
       }
 
       const extractedPages = await ComicProcessor.processFile(file);
       
       if (extractedPages.length === 0) {
-        throw new Error("Aucune image trouvée dans cette archive. Assurez-vous que le fichier contient des images JPG ou PNG.");
+        throw new Error("Aucune page ou image trouvée dans ce fichier. Assurez-vous qu'il contient des images valides.");
       }
 
       setPages(extractedPages);
     } catch (err: any) {
       console.error(err);
-      let msg = "Échec du chargement de la bande dessinée.";
+      let msg = "Échec du chargement du fichier.";
       if (err.message) {
          if (err.message.includes("Corrupted zip")) {
-            msg = "Ce fichier semble être un RAR (CBR) ou est corrompu. Ce lecteur supporte nativement les fichiers CBZ (Zip). Veuillez convertir en CBZ ou essayer un autre fichier.";
+            msg = "Ce fichier est corrompu ou utilise un format d'archive non standard (comme RAR/CBR). Veuillez essayer un format CBZ, PDF ou EPUB.";
          } else {
             msg = err.message;
          }
