@@ -112,6 +112,12 @@ const UploadView: React.FC<UploadViewProps> = ({ onFileSelect, isLoading, error 
           </div>
         )}
       </div>
+
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center z-10">
+        <p className="text-xs font-medium text-gray-700 tracking-widest uppercase opacity-60 select-none">
+          100% gratuit
+        </p>
+      </div>
     </div>
   );
 };
