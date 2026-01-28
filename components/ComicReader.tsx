@@ -9,6 +9,22 @@ interface ComicReaderProps {
   filename: string;
 }
 
+// Interfaces pour gérer les préfixes vendeurs (Cross-browser compatibility)
+interface DocumentWithFullscreen extends Document {
+  mozFullScreenElement?: Element;
+  msFullscreenElement?: Element;
+  webkitFullscreenElement?: Element;
+  mozCancelFullScreen?: () => Promise<void>;
+  msExitFullscreen?: () => Promise<void>;
+  webkitExitFullscreen?: () => Promise<void>;
+}
+
+interface HTMLElementWithFullscreen extends HTMLElement {
+  mozRequestFullScreen?: () => Promise<void>;
+  msRequestFullscreen?: () => Promise<void>;
+  webkitRequestFullscreen?: () => Promise<void>;
+}
+
 const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [scale, setScale] = useState(1);
@@ -34,19 +50,29 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentPage, mode, isSidebarOpen]);
 
-  // Handle Fullscreen change events (Standard + Webkit)
+  // Handle Fullscreen change events (Standard + Webkit + Mozilla + MS)
   useEffect(() => {
     const handleFullscreenChange = () => {
-      const doc = document as any;
-      setIsFullscreen(!!(doc.fullscreenElement || doc.webkitFullscreenElement));
+      const doc = document as DocumentWithFullscreen;
+      const isFull = !!(
+        doc.fullscreenElement || 
+        doc.webkitFullscreenElement || 
+        doc.mozFullScreenElement || 
+        doc.msFullscreenElement
+      );
+      setIsFullscreen(isFull);
     };
     
     document.addEventListener('fullscreenchange', handleFullscreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
     
     return () => {
       document.removeEventListener('fullscreenchange', handleFullscreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
     };
   }, []);
 
@@ -75,25 +101,40 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
   const toggleMode = () => setMode(m => m === ReadingMode.Single ? ReadingMode.Double : ReadingMode.Single);
 
   const toggleFullscreen = async () => {
-    const doc = document as any;
-    const elem = document.documentElement as any;
+    const doc = document as DocumentWithFullscreen;
+    const elem = document.documentElement as HTMLElementWithFullscreen;
 
-    if (!doc.fullscreenElement && !doc.webkitFullscreenElement) {
-      try {
+    const isFull = !!(
+      doc.fullscreenElement || 
+      doc.webkitFullscreenElement || 
+      doc.mozFullScreenElement || 
+      doc.msFullscreenElement
+    );
+
+    try {
+      if (!isFull) {
         if (elem.requestFullscreen) {
           await elem.requestFullscreen();
         } else if (elem.webkitRequestFullscreen) {
           await elem.webkitRequestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+          await elem.mozRequestFullScreen();
+        } else if (elem.msRequestFullscreen) {
+          await elem.msRequestFullscreen();
         }
-      } catch (err) {
-        console.error("Error attempting to enable fullscreen:", err);
+      } else {
+        if (doc.exitFullscreen) {
+          await doc.exitFullscreen();
+        } else if (doc.webkitExitFullscreen) {
+          await doc.webkitExitFullscreen();
+        } else if (doc.mozCancelFullScreen) {
+          await doc.mozCancelFullScreen();
+        } else if (doc.msExitFullscreen) {
+          await doc.msExitFullscreen();
+        }
       }
-    } else {
-      if (doc.exitFullscreen) {
-        await doc.exitFullscreen();
-      } else if (doc.webkitExitFullscreen) {
-        await doc.webkitExitFullscreen();
-      }
+    } catch (err) {
+      console.error("Erreur lors du changement de mode plein écran:", err);
     }
   };
 
