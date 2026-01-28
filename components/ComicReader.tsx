@@ -28,20 +28,26 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
         prevPage();
       } else if (e.key === 'Escape') {
         if (isSidebarOpen) setIsSidebarOpen(false);
-        // Do not close app on escape if purely exiting fullscreen, handled by browser
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentPage, mode, isSidebarOpen]);
 
-  // Handle Fullscreen change events
+  // Handle Fullscreen change events (Standard + Webkit)
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
+      const doc = document as any;
+      setIsFullscreen(!!(doc.fullscreenElement || doc.webkitFullscreenElement));
     };
+    
     document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+    };
   }, []);
 
   const totalPages = pages.length;
@@ -69,15 +75,24 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
   const toggleMode = () => setMode(m => m === ReadingMode.Single ? ReadingMode.Double : ReadingMode.Single);
 
   const toggleFullscreen = async () => {
-    if (!document.fullscreenElement) {
+    const doc = document as any;
+    const elem = document.documentElement as any;
+
+    if (!doc.fullscreenElement && !doc.webkitFullscreenElement) {
       try {
-        await document.documentElement.requestFullscreen();
+        if (elem.requestFullscreen) {
+          await elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+          await elem.webkitRequestFullscreen();
+        }
       } catch (err) {
         console.error("Error attempting to enable fullscreen:", err);
       }
     } else {
-      if (document.exitFullscreen) {
-        await document.exitFullscreen();
+      if (doc.exitFullscreen) {
+        await doc.exitFullscreen();
+      } else if (doc.webkitExitFullscreen) {
+        await doc.webkitExitFullscreen();
       }
     }
   };
@@ -108,7 +123,8 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
         src={pages[currentPage].url} 
         alt={`Page ${currentPage + 1}`} 
         className="shadow-2xl max-w-full h-auto object-contain transition-transform duration-200"
-        style={{ transform: `scale(${scale})`, maxHeight: '95vh' }}
+        style={{ transform: `scale(${scale})`, maxHeight: '95dvh' }}
+        loading="lazy"
       />
     </div>
   );
@@ -122,15 +138,17 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
         <img 
           src={firstPage.url} 
           alt={`Page ${currentPage + 1}`} 
-          className="shadow-2xl max-h-[95vh] w-auto object-contain max-w-[50%]"
+          className="shadow-2xl max-h-[95dvh] w-auto object-contain max-w-[50%]"
           style={{ transform: `scale(${scale})` }}
+          loading="lazy"
         />
         {secondPage && (
           <img 
             src={secondPage.url} 
             alt={`Page ${currentPage + 2}`} 
-            className="shadow-2xl max-h-[95vh] w-auto object-contain max-w-[50%]"
+            className="shadow-2xl max-h-[95dvh] w-auto object-contain max-w-[50%]"
             style={{ transform: `scale(${scale})` }}
+            loading="lazy"
           />
         )}
       </div>

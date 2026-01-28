@@ -51,7 +51,7 @@ const UploadView: React.FC<UploadViewProps> = ({ onFileSelect, isLoading, error 
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-950 relative overflow-hidden">
+    <div className="min-h-screen min-h-dvh flex flex-col items-center justify-center p-4 bg-gray-950 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-600/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />

@@ -2,8 +2,8 @@ import JSZip from 'jszip';
 import { ComicPage } from '../types';
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Configurer le worker PDF.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://esm.sh/pdfjs-dist@4.0.379/build/pdf.worker.min.mjs`;
+// Configurer le worker PDF.js avec la même version que la dépendance principale
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://esm.sh/pdfjs-dist@5.4.530/build/pdf.worker.min.mjs`;
 
 /**
  * Validates if a file entry is an image
@@ -73,7 +73,7 @@ export class ComicProcessor {
 
     } catch (error) {
       console.error("Error processing zip/epub file:", error);
-      throw new Error("Impossible de traiter le fichier. Assurez-vous qu'il s'agit d'une archive valide (CBZ, EPUB, ZIP).");
+      throw new Error("Impossible de traiter le fichier. Assurez-vous qu'il s'agit d'une archive valide (CBZ, EPUB, ZIP). Les fichiers CBR (RAR) ne sont pas supportés s'ils ne sont pas au format ZIP.");
     }
   }
 

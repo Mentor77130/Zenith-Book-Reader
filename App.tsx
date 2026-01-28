@@ -18,7 +18,7 @@ function App() {
     try {
       const extension = file.name.split('.').pop()?.toLowerCase();
       
-      // Basic extension check for UX, though processor handles logic
+      // Basic extension check for UX
       if (extension === 'cbr') {
         console.warn("Fichier CBR détecté. Tentative de traitement en tant que Zip.");
       }
@@ -34,8 +34,8 @@ function App() {
       console.error(err);
       let msg = "Échec du chargement du fichier.";
       if (err.message) {
-         if (err.message.includes("Corrupted zip")) {
-            msg = "Ce fichier est corrompu ou utilise un format d'archive non standard (comme RAR/CBR). Veuillez essayer un format CBZ, PDF ou EPUB.";
+         if (err.message.includes("Corrupted zip") || err.message.includes("End of data")) {
+            msg = "Format de fichier non supporté. Ce fichier CBR semble être une archive RAR (non compatible). Veuillez utiliser des fichiers CBZ (Zip) ou PDF.";
          } else {
             msg = err.message;
          }
@@ -64,7 +64,7 @@ function App() {
   }, [pages]);
 
   return (
-    <div className="h-screen w-screen bg-gray-950 text-white font-sans antialiased">
+    <div className="h-screen h-dvh w-screen bg-gray-950 text-white font-sans antialiased overflow-hidden">
       {pages.length > 0 ? (
         <ComicReader 
           pages={pages} 
