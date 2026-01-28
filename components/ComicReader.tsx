@@ -158,13 +158,15 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
   };
 
   // Render Logic
+  // Ajout de padding-top (pt-16) quand les contrôles sont visibles pour éviter l'obstruction par la barre du haut
+  // Ajout de padding-bottom (pb-24) pour éviter l'obstruction par la barre du bas
   const renderSinglePage = () => (
-    <div className="flex justify-center items-start min-h-full py-4">
+    <div className={`flex justify-center items-start min-h-full transition-all duration-300 ${showControls ? 'pt-16 pb-24' : 'py-0'}`}>
       <img 
         src={pages[currentPage].url} 
         alt={`Page ${currentPage + 1}`} 
         className="shadow-2xl max-w-full h-auto object-contain transition-transform duration-200"
-        style={{ transform: `scale(${scale})`, maxHeight: '95dvh' }}
+        style={{ transform: `scale(${scale})`, maxHeight: showControls ? 'calc(100dvh - 140px)' : '100dvh' }}
         loading="lazy"
       />
     </div>
@@ -175,20 +177,20 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
     const secondPage = pages[currentPage + 1];
 
     return (
-      <div className="flex justify-center items-center min-h-full gap-2 py-4 px-4">
+      <div className={`flex justify-center items-center min-h-full gap-2 px-4 transition-all duration-300 ${showControls ? 'pt-16 pb-24' : 'py-0'}`}>
         <img 
           src={firstPage.url} 
           alt={`Page ${currentPage + 1}`} 
-          className="shadow-2xl max-h-[95dvh] w-auto object-contain max-w-[50%]"
-          style={{ transform: `scale(${scale})` }}
+          className="shadow-2xl h-auto object-contain max-w-[50%]"
+          style={{ transform: `scale(${scale})`, maxHeight: showControls ? 'calc(100dvh - 140px)' : '100dvh' }}
           loading="lazy"
         />
         {secondPage && (
           <img 
             src={secondPage.url} 
             alt={`Page ${currentPage + 2}`} 
-            className="shadow-2xl max-h-[95dvh] w-auto object-contain max-w-[50%]"
-            style={{ transform: `scale(${scale})` }}
+            className="shadow-2xl h-auto object-contain max-w-[50%]"
+            style={{ transform: `scale(${scale})`, maxHeight: showControls ? 'calc(100dvh - 140px)' : '100dvh' }}
             loading="lazy"
           />
         )}
