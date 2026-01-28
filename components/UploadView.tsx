@@ -86,7 +86,7 @@ const UploadView: React.FC<UploadViewProps> = ({ onFileSelect, isLoading, error 
           <input 
             type="file" 
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-            accept=".cbz,.zip,.cbr,.pdf,.epub,.pub,application/zip,application/x-zip-compressed,application/x-cbr,application/x-rar-compressed,application/pdf,application/epub+zip"
+            accept=".cbz,.cbr,.zip,.rar,.pdf,.epub,.pub,application/vnd.comicbook+zip,application/vnd.comicbook-rar,application/zip,application/x-zip-compressed,application/x-zip,application/x-cbr,application/x-rar-compressed,application/x-rar,application/pdf,application/epub+zip,application/octet-stream"
             onChange={handleChange}
             disabled={isLoading}
           />
