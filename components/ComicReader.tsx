@@ -96,8 +96,8 @@ const ComicReader: React.FC<ComicReaderProps> = ({ pages, onClose, filename }) =
     }
   };
 
-  const handleZoomIn = () => setScale(s => Math.min(s + 0.25, 3));
-  const handleZoomOut = () => setScale(s => Math.max(s - 0.25, 0.5));
+  const handleZoomIn = () => setScale(s => Math.min(s + 0.1, 3));
+  const handleZoomOut = () => setScale(s => Math.max(s - 0.1, 0.5));
   const toggleMode = () => setMode(m => m === ReadingMode.Single ? ReadingMode.Double : ReadingMode.Single);
 
   const toggleFullscreen = async () => {
